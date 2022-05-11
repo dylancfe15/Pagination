@@ -9,11 +9,10 @@ exports.getStocks = functions.https.onCall(async (request, context) => {
     const { currentCount, stortedBy } = request
     const limit = 10
     const endIndex = currentCount - 1
-    stortedBy = stortedBy == null ? 'symbol' : stortedBy
 
     try {
         let reference = firestore.collection('Stocks')
-        let stocks = await reference.orderBy(stortedBy).get()
+        let stocks = await reference.orderBy(stortedBy == null ? 'symbol' : stortedBy).get()
 
         if (stortedBy != null) {
             return stocks.slice(endIndex)
