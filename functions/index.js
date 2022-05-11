@@ -6,22 +6,21 @@ admin.initializeApp()
 const firestore = admin.firestore()
 
 exports.getStocks = functions.https.onCall(async (request, context) => {
-    const { currentCount, stortedBy } = request
+    const { currentCount, sortedBy, isPaginating } = request
     const limit = 10
-    const endIndex = currentCount - 1
 
     try {
-        let reference = firestore.collection('Stocks')
-        let stocks = await reference.orderBy(stortedBy == null ? 'symbol' : stortedBy).get()
+        let snapshot = await firestore.collection('Stocks').get()
+        let stocks = snapshot.docs.map ( doc => doc.data() )
 
-        if (stortedBy != null) {
-            return stocks.slice(endIndex)
+        if (!isPaginating) {
+            return stocks.slice(currentCount)
         } else {
-            return stocks.slice(endIndex, endIndex+limit)
+            return stocks.slice(currentCount, currentCount+limit)
         }
     } catch(error) {
         console.log(error)
 
-        return { success: false }
+        return []
     }
 })
