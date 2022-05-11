@@ -6,19 +6,17 @@ admin.initializeApp()
 const firestore = admin.firestore()
 
 exports.getStocks = functions.https.onCall(async (request, context) => {
-    const { currentCount, isPaginating } = request
-    const limit = 15
+    const { currentCount } = request
+    const limit = 20
 
     try {
         let snapshot = await firestore.collection('Stocks').get()
-        let stocks = snapshot.docs.map ( doc => doc.data() ).slice(0, 99)
+        let stocks = snapshot.docs.map ( doc => doc.data() ).slice(0, 50)
 
-        if (!isPaginating) {
-            return { total: stocks.length, stocks: stocks.slice(currentCount) }
-        } else if (currentCount+limit < stocks.length) {
+        if (currentCount+limit < stocks.length) {
             return { total: stocks.length, stocks: stocks.slice(currentCount, currentCount + limit) }
         } else {
-            return { total: stocks.length, stocks: stocks.slice(currentCount, stocks.length - 1) }
+            return { total: stocks.length, stocks: stocks.slice(currentCount, stocks.length) }
         }
     } catch(error) {
         console.log(error)
