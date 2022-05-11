@@ -11,16 +11,18 @@ exports.getStocks = functions.https.onCall(async (request, context) => {
 
     try {
         let snapshot = await firestore.collection('Stocks').get()
-        let stocks = snapshot.docs.map ( doc => doc.data() )
+        let stocks = snapshot.docs.map ( doc => doc.data() ).slice(0, 99)
 
         if (!isPaginating) {
-            return stocks.slice(currentCount)
+            return { total: stocks.length, stocks: stocks.slice(currentCount) }
+        } else if (currentCount+limit < stocks.length) {
+            return { total: stocks.length, stocks: stocks.slice(currentCount, currentCount + limit) }
         } else {
-            return stocks.slice(currentCount, currentCount+limit)
+            return { total: stocks.length, stocks: stocks.slice(currentCount, stocks.length - 1) }
         }
     } catch(error) {
         console.log(error)
 
-        return []
+        return {}
     }
 })
