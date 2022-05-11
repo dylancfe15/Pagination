@@ -6,8 +6,8 @@ admin.initializeApp()
 const firestore = admin.firestore()
 
 exports.getStocks = functions.https.onCall(async (request, context) => {
-    const { currentCount, sortedBy, isPaginating } = request
-    const limit = 10
+    const { currentCount, isPaginating } = request
+    const limit = 15
 
     try {
         let snapshot = await firestore.collection('Stocks').get()
